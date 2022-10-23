@@ -31,6 +31,16 @@ class ApiFeatures{
 
         return this;
     }
+
+    pagination(resultPerPage){
+        const currPage = Number(this.queryStr.page) || 1;
+
+        // If we have 50 products and we want to disply 10 products per page.. skip = 50-10
+        const skip = resultPerPage * (currPage - 1);
+
+        this.query = this.query.limit(resultPerPage).skip(skip);
+        return this;
+    }
 }
 
 module.exports = ApiFeatures;
