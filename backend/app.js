@@ -1,5 +1,6 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
+// const session = require('express-session');
 
 const app = express();
 
@@ -7,6 +8,7 @@ const errorMiddleware = require('./middleware/error');
 
 app.use(express.json());
 app.use(cookieParser());
+// app.use(session({secret: 'abcdefg', resave: true, saveUninitialized: false}));
 // Route import 
 const product = require('./routes/productRoute');
 const user = require('./routes/userRoute');
