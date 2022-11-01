@@ -87,6 +87,7 @@ exports.forgotPassword = catchAsyncError(async (req, res, next)=>{
     }
 })
 
+// Reset Password Generation
 exports.resetPassword = catchAsyncError(async(req, res, next)=>{
 
     // Creating token hash
@@ -110,4 +111,57 @@ exports.resetPassword = catchAsyncError(async(req, res, next)=>{
     user.save();
 
     sendToken(user, 200, res);
+})
+
+// Get user details
+exports.getUserDeatils = catchAsyncError(async (req, res, next) =>{
+
+    const user = await User.findById(req.user.id);
+
+    res.status(200).json({
+        success: true,
+        user   
+    });
+});
+
+// Update Password
+exports.updatePassword = catchAsyncError(async (req, res, next) =>{
+
+    const user = await User.findById(req.user.id).select("+password");
+
+    const isPassMatched = await user.comparePassword(req.body.oldPassword);
+
+    if (!isPassMatched){
+        return next(new ErrorHandler("Old password is incorrect", 400));
+    }
+
+    if (req.body.newPassword != req.body.confirmPassword){
+        return next(new ErrorHandler("Password Doesn't match", 400));
+    }
+
+    user.password = req.body.newPassword;
+    await user.save();
+    
+    sendToken(user, 200, res);
+});
+
+// Update user data
+exports.updateProfile = catchAsyncError(async (req, res, next) =>{
+
+    const newUserData = {
+        name:req.body.name,
+        email:req.body.email
+    }
+
+    const user = await User.findByIdAndUpdate(req.user.id, newUserData,{
+        new:true,
+        runValidators:true,
+        useFindAndModify:false
+    });
+
+    res.status(200).json({
+        success:true,
+        user
+    })
+
 })
